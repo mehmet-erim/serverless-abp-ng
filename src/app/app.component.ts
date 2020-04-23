@@ -2,16 +2,18 @@ import { Component, OnInit } from '@angular/core';
 import { ConfirmationService } from '@abp/ng.theme.shared';
 import { LazyLoadService, LOADING_STRATEGY } from '@abp/ng.core';
 import { forkJoin } from 'rxjs';
+import { Store } from '@ngxs/store';
+import mockData from './app-configuration-data';
 
 @Component({
   selector: 'app-root',
-  templateUrl: './app.component.html',
-  styleUrls: ['./app.component.scss'],
+  template: `<router-outlet></router-outlet>`,
 })
 export class AppComponent implements OnInit {
   constructor(
     private confirmation: ConfirmationService,
-    private lazyLoadService: LazyLoadService
+    private lazyLoadService: LazyLoadService,
+    private store: Store
   ) {}
 
   ngOnInit() {
@@ -25,7 +27,13 @@ export class AppComponent implements OnInit {
         LOADING_STRATEGY.PrependAnonymousStyleToHead('fontawesome-all.min.css')
       ),
     ]).subscribe();
+
+    this.store.reset({
+      ...this.store.selectSnapshot((s) => s),
+      ConfigState: mockData,
+    });
   }
+
   openConfirmation() {
     this.confirmation.warn('This entity will be deleted!', 'Are you sure?');
   }
